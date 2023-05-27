@@ -13,7 +13,7 @@ if [ -n "${DASHBOARD_VERSION}" ]; then
   sudo -i -u vagrant kubectl wait --namespace kube-system \
     --for=condition=ready pod \
     --selector=k8s-app=metrics-server \
-    --timeout=120s
+    --timeout=180s
   #while sudo -i -u vagrant kubectl get pods -A -l k8s-app=metrics-server | awk 'split($3, a, "/") && a[1] != a[2] { print $0; }' | grep -v "RESTARTS"; do
   #  echo 'Waiting for metrics server to be ready...'
   #  sleep 5
