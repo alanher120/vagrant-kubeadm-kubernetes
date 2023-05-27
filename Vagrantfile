@@ -17,7 +17,10 @@ Vagrant.configure("2") do |config|
   config.cache.scope = :machine
   config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
       apt-get update -y
-      echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
+      for i in `seq 1 ${NUM_MASTER_NODES}`; do
+        echo "$IP_NW$((IP_START-1+i)) master-node${i}" >> /etc/hosts
+      done
+      
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
         echo "$IP_NW$((IP_START+4+i)) worker-node0${i}" >> /etc/hosts
       done
