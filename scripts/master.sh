@@ -27,6 +27,7 @@ if [ "$HOSTNAME" == "master-node" ];then
   #kubectl apply -f calico.yaml
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
   
+  sleep 60
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
                 --selector=k8s-app=calico-node \
