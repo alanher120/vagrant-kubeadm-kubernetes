@@ -60,6 +60,14 @@ Vagrant.configure("2") do |config|
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
       path: "scripts/master.sh"
+    if settings["software"]["metallb"]
+      master.vm.provision "shell", 
+      env: {
+        "METALLB_VERSION" => settings["software"]["metallb"],
+        "METALLB_ADDR_POOL" => settings["software"]["metallb"]["addr_pool"]
+      },
+      path: "scripts/metallb.sh"
+    end
   end
 
   (1..NUM_WORKER_NODES).each do |i|
