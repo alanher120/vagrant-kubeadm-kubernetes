@@ -29,13 +29,14 @@ nodes:
 # shared_folders:
 #   - host_path: ../images
 #     vm_path: /vagrant/images
+metallb:
+    addr_pool: 10.0.0.10-10.0.0.10
 software:
   box: bento/ubuntu-22.04
   calico: 3.25.0
   # To skip the dashboard installation, set its version to an empty value or comment it out:
   dashboard: 2.7.0
   metallb: 0.13.9
-    addr_pool: 10.0.0.10-10.0.0.10
   ingress_nginx: 1.0.0-alpha.1
   kubernetes: 1.26.5-00
   os: xUbuntu_22.04
