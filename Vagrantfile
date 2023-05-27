@@ -17,7 +17,8 @@ Vagrant.configure("2") do |config|
   config.cache.scope = :machine
   
   config.vm.provision "shell",
-    env: { "IP_NW" => IP_NW,
+    env: { 
+      "IP_NW" => IP_NW,
       "IP_START" => IP_START,
       "NUM_WORKER_NODES" => NUM_WORKER_NODES,
       "NUM_MASTER_NODES" => NUM_MASTER_NODES
@@ -72,6 +73,7 @@ Vagrant.configure("2") do |config|
         "CALICO_VERSION" => settings["software"]["calico"],
         "CONTROL_IP" => settings["network"]["control_ip"],
         "POD_CIDR" => settings["network"]["pod_cidr"],
+        "IP_START" => IP_START,
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
       path: "scripts/master.sh"
