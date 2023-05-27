@@ -91,7 +91,11 @@ Vagrant.configure("2") do |config|
 
       # Only install the dashboard after provisioning the first worker (and when enabled).
       if i == 1 and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
-        node.vm.provision "shell", path: "scripts/dashboard.sh"
+        node.vm.provision "shell", 
+        env: {
+          "DASHBOARD_VERSION" => settings["software"]["dashboard"]
+        },
+        path: "scripts/dashboard.sh"
       end
       
       if i == 1 and settings["software"]["metallb"]
