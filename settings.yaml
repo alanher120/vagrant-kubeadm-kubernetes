@@ -36,5 +36,6 @@ software:
   dashboard: 2.7.0
   metallb: 0.13.9
     addr_pool: 10.0.0.10-10.0.0.10
+  ingress_nginx: 1.0.0-alpha.1
   kubernetes: 1.26.5-00
   os: xUbuntu_22.04
