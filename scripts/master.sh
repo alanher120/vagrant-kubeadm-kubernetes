@@ -11,7 +11,7 @@ sudo kubeadm config images pull
 
 echo "Preflight Check Passed: Downloaded All Required Images"
 
-if [ "$HOSTNAME" == "master-node" ];the
+if [ "$HOSTNAME" == "master-node" ];then
   # runing on first master
   sudo kubeadm init --apiserver-advertise-address=$CONTROL_IP --apiserver-cert-extra-sans=$CONTROL_IP --pod-network-cidr=$POD_CIDR --service-cidr=$SERVICE_CIDR --node-name "$NODENAME" --ignore-preflight-errors Swap
   
