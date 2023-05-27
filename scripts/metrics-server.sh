@@ -8,5 +8,5 @@ echo 'Waiting for metrics server to be ready...'
 sudo -i -u vagrant kubectl wait --namespace kube-system \
   --for=condition=ready pod \
   --selector=k8s-app=metrics-server \
-  --timeout=120s
+  --timeout=180s
 echo 'Metrics server is ready.'
