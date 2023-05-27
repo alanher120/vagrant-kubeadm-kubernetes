@@ -42,16 +42,17 @@ if [ "$HOSTNAME" == "master-node" ];then
   cp -i /etc/kubernetes/admin.conf $config_path/config
   
   # create join.sh
-  kubeadm token create --print-join-command > $config_path/join.sh
+  kubeadm token create --ttl 72h0m0s --print-join-command > $config_path/join.sh
   touch $config_path/join.sh
   chmod +x $config_path/join.sh
   
+  # create cert key
+  kubeadm init phase upload-certs --upload-certs > $config_path/master-join-cert-key
+  touch $config_path/master-join-cert-key
+  
   # create master-join.sh
-  kubeadm init phase upload-certs --upload-certs > $config_path/master-cert-key
-  CERT_KEY=`tail -1 $config_path/master-cert-key`
-  cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key ${CERT_KEY}" ;done > $config_path/master-join.sh
-  touch $config_path/join.sh
-  chmod +x $config_path/join.sh
+  cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key `tail -1 $config_path/master-join-cert-key` --apiserver-advertise-address=10.0.0.$((IP_START-1+i))" ;done > $config_path/master-join.sh
+  
 else
   # runing on non-first master
   /bin/bash $config_path/master-join.sh -v 
