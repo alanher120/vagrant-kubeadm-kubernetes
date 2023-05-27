@@ -13,6 +13,6 @@ fi
 sudo -i -u vagrant kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=120s
+  --timeout=180s
 
 echo "ingress-nginx installed"
