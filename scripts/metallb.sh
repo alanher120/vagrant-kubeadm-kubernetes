@@ -2,21 +2,21 @@
 set -euxo pipefail
 
 # actually apply the changes, returns nonzero returncode on errors only
-kubectl get configmap kube-proxy -n kube-system -o yaml | \
+sudo -i -u vagrant kubectl get configmap kube-proxy -n kube-system -o yaml | \
 sed -e "s/strictARP: false/strictARP: true/" | \
-kubectl apply -f - -n kube-system
+sudo -i -u vagrant kubectl apply -f - -n kube-system
 
 # Installation By Manifest
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${METALLB_VERSION}/config/manifests/metallb-native.yaml
+sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${METALLB_VERSION}/config/manifests/metallb-native.yaml
 
 # Wait until the MetalLB pods (controller and speakers) are ready
-kubectl wait --namespace metallb-system \
+sudo -i -u vagrant kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
                 --selector=app=metallb \
                 --timeout=120s
 
 # Setup address pool used by loadbalancers
-cat << EOF | kubectl apply -f -
+cat << EOF | sudo -i -u vagrant kubectl apply -f -
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
