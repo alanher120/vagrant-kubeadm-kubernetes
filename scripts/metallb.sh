@@ -7,7 +7,12 @@ sed -e "s/strictARP: false/strictARP: true/" | \
 sudo -i -u vagrant kubectl apply -f - -n kube-system
 
 # Installation By Manifest
-sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${METALLB_VERSION}/config/manifests/metallb-native.yaml
+#sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${METALLB_VERSION}/config/manifests/metallb-native.yaml
+if [ "${METALLB_VERSION}" == "main" ];then
+  sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/config/manifests/metallb-native.yaml
+else
+  sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v${METALLB_VERSION}/config/manifests/metallb-native.yaml
+fi
 
 # Wait until the MetalLB pods (controller and speakers) are ready
 sudo -i -u vagrant kubectl wait --namespace metallb-system \
