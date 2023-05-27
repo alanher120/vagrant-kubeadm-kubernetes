@@ -27,6 +27,16 @@ if [ "$HOSTNAME" == "master-node" ];then
   #kubectl apply -f calico.yaml
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
   
+  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
+                --for=condition=ready pod \
+                --selector=k8s-app=calico-node \
+                --timeout=180s
+  
+  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
+                --for=condition=ready pod \
+                --selector=k8s-app=calico-kube-controllers \
+                --timeout=180s
+  
   # Save Configs to shared /Vagrant location
   cp -i /etc/kubernetes/admin.conf $config_path/config
   
