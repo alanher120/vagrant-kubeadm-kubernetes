@@ -60,21 +60,6 @@ Vagrant.configure("2") do |config|
         "SERVICE_CIDR" => settings["network"]["service_cidr"]
       },
       path: "scripts/master.sh"
-    if settings["software"]["metallb"]
-      master.vm.provision "shell", 
-      env: {
-        "METALLB_VERSION" => settings["software"]["metallb"],
-        "METALLB_ADDR_POOL" => settings["software"]["metallb"]["addr_pool"]
-      },
-      path: "scripts/metallb.sh"
-    end
-    if settings["software"]["ingress_nginx"]
-      master.vm.provision "shell", 
-      env: {
-        "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
-      },
-      path: "scripts/ingress-nginx.sh"
-    end
   end
 
   (1..NUM_WORKER_NODES).each do |i|
@@ -108,7 +93,24 @@ Vagrant.configure("2") do |config|
       if i == NUM_WORKER_NODES and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
         node.vm.provision "shell", path: "scripts/dashboard.sh"
       end
+      
+      if settings["software"]["metallb"]
+        node.vm.provision "shell", 
+        env: {
+          "METALLB_VERSION" => settings["software"]["metallb"],
+          "METALLB_ADDR_POOL" => settings["software"]["metallb"]["addr_pool"]
+        },
+        path: "scripts/metallb.sh"
+      end
+      
+      if settings["software"]["ingress_nginx"]
+        node.vm.provision "shell", 
+        env: {
+          "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
+        },
+        path: "scripts/ingress-nginx.sh"
+      end
+    
     end
-
   end
 end 
