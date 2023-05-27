@@ -37,6 +37,6 @@ software:
   # To skip the dashboard installation, set its version to an empty value or comment it out:
   dashboard: 2.7.0
   metallb: 0.13.9
-  ingress_nginx: 1.0.0-alpha.1
+  ingress_nginx:
   kubernetes: 1.26.5-00
   os: xUbuntu_22.04
