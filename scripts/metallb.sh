@@ -18,7 +18,7 @@ fi
 sudo -i -u vagrant kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
                 --selector=app=metallb \
-                --timeout=120s
+                --timeout=180s
 
 # Setup address pool used by loadbalancers
 cat << EOF | sudo -i -u vagrant kubectl apply -f -
