@@ -68,6 +68,13 @@ Vagrant.configure("2") do |config|
       },
       path: "scripts/metallb.sh"
     end
+    if settings["software"]["ingress_nginx"]
+      master.vm.provision "shell", 
+      env: {
+        "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
+      },
+      path: "scripts/ingress-nginx.sh"
+    end
   end
 
   (1..NUM_WORKER_NODES).each do |i|
