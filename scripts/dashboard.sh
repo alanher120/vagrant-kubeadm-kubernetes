@@ -8,10 +8,15 @@ config_path="/vagrant/configs"
 
 DASHBOARD_VERSION=$(grep -E '^\s*dashboard:' /vagrant/settings.yaml | sed -E 's/[^:]+: *//')
 if [ -n "${DASHBOARD_VERSION}" ]; then
-  while sudo -i -u vagrant kubectl get pods -A -l k8s-app=metrics-server | awk 'split($3, a, "/") && a[1] != a[2] { print $0; }' | grep -v "RESTARTS"; do
-    echo 'Waiting for metrics server to be ready...'
-    sleep 5
-  done
+  echo 'Waiting for metrics server to be ready...'
+  kubectl wait --namespace kube-system \
+    --for=condition=ready pod \
+    --selector=k8s-app=metrics-server \
+    --timeout=120s
+  #while sudo -i -u vagrant kubectl get pods -A -l k8s-app=metrics-server | awk 'split($3, a, "/") && a[1] != a[2] { print $0; }' | grep -v "RESTARTS"; do
+  #  echo 'Waiting for metrics server to be ready...'
+  #  sleep 5
+  #done
   echo 'Metrics server is ready. Installing dashboard...'
 
   sudo -i -u vagrant kubectl create namespace kubernetes-dashboard
