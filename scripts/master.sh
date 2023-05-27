@@ -59,7 +59,7 @@ if [ "$HOSTNAME" == "master-node" ];then
   
 else
   # runing on non-first master
-  /bin/bash $config_path/master-join.sh -v 
+  /bin/bash $config_path/${NODENAME}.sh -v
   
 fi
 
