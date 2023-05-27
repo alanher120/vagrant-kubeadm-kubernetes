@@ -94,7 +94,7 @@ Vagrant.configure("2") do |config|
         node.vm.provision "shell", path: "scripts/dashboard.sh"
       end
       
-      if settings["software"]["metallb"]
+      if i == 1 and settings["software"]["metallb"]
         node.vm.provision "shell", 
         env: {
           "METALLB_VERSION" => settings["software"]["metallb"],
@@ -103,7 +103,7 @@ Vagrant.configure("2") do |config|
         path: "scripts/metallb.sh"
       end
       
-      if settings["software"]["ingress_nginx"]
+      if i == 1 and settings["software"]["ingress_nginx"]
         node.vm.provision "shell", 
         env: {
           "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
