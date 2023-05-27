@@ -28,12 +28,12 @@ if [ "$HOSTNAME" == "master-node" ];then
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
   
   sleep 60
-  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
+  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
                 --for=condition=ready pod \
                 --selector=k8s-app=calico-kube-controllers \
                 --timeout=180s
   
-  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
+  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
                 --for=condition=ready pod \
                 --selector=k8s-app=calico-node \
                 --timeout=180s
