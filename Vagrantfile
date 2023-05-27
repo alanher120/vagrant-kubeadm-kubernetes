@@ -15,8 +15,19 @@ NUM_MASTER_NODES = settings["nodes"]["control"]["count"]
 Vagrant.configure("2") do |config|
   config.vagrant.plugins = ["vagrant-cachier"]
   config.cache.scope = :machine
-  config.vm.provision "shell", env: { "IP_NW" => IP_NW, "IP_START" => IP_START, "NUM_WORKER_NODES" => NUM_WORKER_NODES }, inline: <<-SHELL
+  
+  config.vm.provision "shell",
+    env: { "IP_NW" => IP_NW,
+      "IP_START" => IP_START,
+      "NUM_WORKER_NODES" => NUM_WORKER_NODES,
+      "NUM_MASTER_NODES" => NUM_MASTER_NODES
+    },
+    inline: <<-SHELL
       apt-get update -y
+      cat /etc/hosts|grep -v node > /etc/hosts.tmp
+      cat /etc/hosts.tmp > /etc/hosts
+      echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
+      
       for i in `seq 1 ${NUM_MASTER_NODES}`; do
         echo "$IP_NW$((IP_START-1+i)) master-node${i}" >> /etc/hosts
       done
