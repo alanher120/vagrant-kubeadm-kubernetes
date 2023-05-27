@@ -8,6 +8,7 @@ config_path="/vagrant/configs"
 
 DASHBOARD_VERSION=$(grep -E '^\s*dashboard:' /vagrant/settings.yaml | sed -E 's/[^:]+: *//')
 if [ -n "${DASHBOARD_VERSION}" ]; then
+  kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
   echo 'Waiting for metrics server to be ready...'
   kubectl wait --namespace kube-system \
     --for=condition=ready pod \
