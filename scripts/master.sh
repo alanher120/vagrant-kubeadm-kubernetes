@@ -15,10 +15,6 @@ if [ "$HOSTNAME" == "master-node" ];the
   # runing on first master
   sudo kubeadm init --apiserver-advertise-address=$CONTROL_IP --apiserver-cert-extra-sans=$CONTROL_IP --pod-network-cidr=$POD_CIDR --service-cidr=$SERVICE_CIDR --node-name "$NODENAME" --ignore-preflight-errors Swap
   
-  mkdir -p "$HOME"/.kube
-  sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
-  sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
-  
   kubeadm init phase upload-certs --upload-certs > $config_path/master-cert-key
   CERT_KEY=`tail -1 $config_path/master-cert-key`
   cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key ${CERT_KEY}" ;done > $config_path/master-join.sh
@@ -26,6 +22,10 @@ else
   # runing on non-first master
   /bin/bash $config_path/master-join.sh -v 
 fi
+
+mkdir -p "$HOME"/.kube
+sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
+sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
 
 # Save Configs to shared /Vagrant location
 
