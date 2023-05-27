@@ -16,7 +16,7 @@ kubectl wait --namespace metallb-system \
                 --timeout=120s
 
 # Setup address pool used by loadbalancers
-cat << EOF > metallb-config.yaml
+cat << EOF | kubectl apply -f -
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
@@ -32,6 +32,5 @@ metadata:
   name: empty
   namespace: metallb-system
 EOF
-kubectl apply -f metallb-config.yaml && rm -f metallb-config.yaml
 
 echo "metallb installed."
