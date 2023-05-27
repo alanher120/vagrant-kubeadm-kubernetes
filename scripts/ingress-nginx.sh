@@ -2,7 +2,12 @@
 set -euxo pipefail
 
 # install 
-sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/v${INGRESS_NGINX_VERSION}/deploy/static/provider/baremetal/deploy.yaml
+#sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/v${INGRESS_NGINX_VERSION}/deploy/static/provider/baremetal/deploy.yaml
+if [ -n "${INGRESS_NGINX_VERSION}" ];then
+  sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/v${INGRESS_NGINX_VERSION}/deploy/static/provider/baremetal/deploy.yaml
+else
+  sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/baremetal/deploy.yaml
+fi
 
 # wait until is ready
 sudo -i -u vagrant kubectl wait --namespace ingress-nginx \
