@@ -25,7 +25,7 @@ if [ "$HOSTNAME" == "master-node" ];then
   # Install Calico Network Plugin
   #curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml -O
   #kubectl apply -f calico.yaml
-  kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
+  KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
   
   # Save Configs to shared /Vagrant location
   cp -i /etc/kubernetes/admin.conf $config_path/config
@@ -44,8 +44,10 @@ if [ "$HOSTNAME" == "master-node" ];then
 else
   # runing on non-first master
   /bin/bash $config_path/master-join.sh -v 
+  
 fi
 
+# create kube-config
 mkdir -p "$HOME"/.kube
 sudo cp -i /etc/kubernetes/admin.conf "$HOME"/.kube/config
 sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
