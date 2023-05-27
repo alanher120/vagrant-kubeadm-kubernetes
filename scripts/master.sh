@@ -50,8 +50,12 @@ if [ "$HOSTNAME" == "master-node" ];then
   kubeadm init phase upload-certs --upload-certs > $config_path/master-join-cert-key
   touch $config_path/master-join-cert-key
   
-  # create master-join.sh
-  cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key `tail -1 $config_path/master-join-cert-key` --apiserver-advertise-address=10.0.0.$((IP_START-1+i))" ;done > $config_path/master-join.sh
+  for i in 2 3 4 5;do
+    # create master-join.sh
+    cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key `tail -1 $config_path/master-join-cert-key` --apiserver-advertise-address=10.0.0.$((IP_START-1+i))" ;done > $config_path/master-node${i}.sh
+    touch $config_path/master-node${i}.sh
+    chmod +x $config_path/master-node${i}.sh
+  done
   
 else
   # runing on non-first master
