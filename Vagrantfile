@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
       apt-get update -y
       echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
       for i in `seq 1 ${NUM_WORKER_NODES}`; do
-        echo "$IP_NW$((IP_START+i)) worker-node0${i}" >> /etc/hosts
+        echo "$IP_NW$((IP_START+4+i)) worker-node0${i}" >> /etc/hosts
       done
   SHELL
 
