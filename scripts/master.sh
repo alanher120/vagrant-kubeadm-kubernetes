@@ -30,12 +30,12 @@ if [ "$HOSTNAME" == "master-node" ];then
   sleep 60
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
-                --selector=k8s-app=calico-node \
+                --selector=k8s-app=calico-kube-controllers \
                 --timeout=180s
   
   KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace metallb-system \
                 --for=condition=ready pod \
-                --selector=k8s-app=calico-kube-controllers \
+                --selector=k8s-app=calico-node \
                 --timeout=180s
   
   # Save Configs to shared /Vagrant location
