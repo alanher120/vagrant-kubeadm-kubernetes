@@ -22,6 +22,8 @@ if [ "$HOSTNAME" == "master-node" ];then
   # runing on first master
   sudo kubeadm init --apiserver-advertise-address=$CONTROL_IP --apiserver-cert-extra-sans=$CONTROL_IP --pod-network-cidr=$POD_CIDR --service-cidr=$SERVICE_CIDR --node-name "$NODENAME" --ignore-preflight-errors Swap
   
+  kubeadm token create --print-join-command > $config_path/join.sh
+  
   kubeadm init phase upload-certs --upload-certs > $config_path/master-cert-key
   CERT_KEY=`tail -1 $config_path/master-cert-key`
   cat $config_path/join.sh|while read x;do echo "${x} --control-plane --certificate-key ${CERT_KEY}" ;done > $config_path/master-join.sh
@@ -39,8 +41,6 @@ sudo chown "$(id -u)":"$(id -g)" "$HOME"/.kube/config
 cp -i /etc/kubernetes/admin.conf $config_path/config
 touch $config_path/join.sh
 chmod +x $config_path/join.sh
-
-kubeadm token create --print-join-command > $config_path/join.sh
 
 # Install Calico Network Plugin
 
