@@ -10,6 +10,7 @@ IP_NW = IP_SECTIONS.captures[0]
 # Last octet excluding all dots:
 IP_START = Integer(IP_SECTIONS.captures[1])
 NUM_WORKER_NODES = settings["nodes"]["workers"]["count"]
+NUM_MASTER_NODES = settings["nodes"]["control"]["count"]
 
 Vagrant.configure("2") do |config|
   config.vagrant.plugins = ["vagrant-cachier"]
