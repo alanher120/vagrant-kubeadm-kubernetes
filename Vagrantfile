@@ -151,7 +151,8 @@ Vagrant.configure("2") do |config|
       if i == 1 and settings["software"]["dashboard"] and settings["software"]["dashboard"] != ""
         node.vm.provision "shell", 
         env: {
-          "DASHBOARD_VERSION" => settings["software"]["dashboard"]
+          "DASHBOARD_VERSION" => settings["software"]["dashboard"],
+          "METRICS_SERVER_VERSION" => settings["software"]["metrics_server"]
         },
         path: "scripts/dashboard.sh"
       end
