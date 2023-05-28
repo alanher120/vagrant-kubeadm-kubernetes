@@ -34,6 +34,10 @@ nodes:
 metallb:
     addr_pool: 10.0.0.10-10.0.0.10
 software:
+  # can be calico flannel
+  cni: calico
+  # can be cri-o containerd docker
+  cri: cri-o
   box: bento/ubuntu-22.04
   calico: 3.25.0
   # To skip the dashboard installation, set its version to an empty value or comment it out:
