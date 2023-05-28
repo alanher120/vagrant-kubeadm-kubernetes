@@ -37,6 +37,7 @@ software:
   box: bento/ubuntu-22.04
   calico: 3.25.0
   # To skip the dashboard installation, set its version to an empty value or comment it out:
+  metrics_server: main
   dashboard: 2.7.0
   metallb: 0.13.9
   ingress_nginx: main
