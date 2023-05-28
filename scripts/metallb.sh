@@ -37,7 +37,7 @@ if [ -n "${METALLB_VERSION}" ];then
   metadata:
     name: empty
     namespace: metallb-system
-  EOF
+EOF
 
   echo "metallb installed."
 fi
