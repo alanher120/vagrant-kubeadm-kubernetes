@@ -44,10 +44,11 @@ Vagrant.configure("2") do |config|
     config.vm.box = settings["software"]["box"]
   end
   config.vm.box_check_update = true
-
-  config.vm.define "master" do |master|
-    master.vm.hostname = "master-node"
-    master.vm.network "private_network", ip: settings["network"]["control_ip"]
+  
+  i=1
+  config.vm.define "master#{i}" do |master|
+    master.vm.hostname = "master-node#{i}"
+    master.vm.network "private_network", ip: "#{IP_NW} + #{IP_START - 1 + i}"
     if settings["shared_folders"]
       settings["shared_folders"].each do |shared_folder|
         master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
@@ -84,7 +85,7 @@ Vagrant.configure("2") do |config|
     (2..NUM_MASTER_NODES).each do |i|
       config.vm.define "master#{i}" do |master|
         master.vm.hostname = "master-node#{i}"
-        master.vm.network "private_network", ip: IP_NW + "#{IP_START - 1 + i}"
+        master.vm.network "private_network", ip: "#{IP_NW} + #{IP_START - 1 + i}"
         if settings["shared_folders"]
           settings["shared_folders"].each do |shared_folder|
             master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
@@ -110,6 +111,8 @@ Vagrant.configure("2") do |config|
             "CALICO_VERSION" => settings["software"]["calico"],
             "CONTROL_IP" => settings["network"]["control_ip"],
             "POD_CIDR" => settings["network"]["pod_cidr"],
+            "IP_NW" => IP_NW,
+            "IP_START" => IP_START,
             "SERVICE_CIDR" => settings["network"]["service_cidr"]
           },
           path: "scripts/master.sh"
@@ -152,7 +155,6 @@ Vagrant.configure("2") do |config|
         },
         path: "scripts/dashboard.sh"
       end
-      
       if i == 1 and settings["software"]["metallb"]
         node.vm.provision "shell", 
         env: {
@@ -161,7 +163,6 @@ Vagrant.configure("2") do |config|
         },
         path: "scripts/metallb.sh"
       end
-      
       if i == 1 and settings["software"]["ingress_nginx"]
         node.vm.provision "shell", 
         env: {
