@@ -23,20 +23,20 @@ if [ -n "${METALLB_VERSION}" ];then
 
   # Setup address pool used by loadbalancers
   cat << EOF | sudo -i -u vagrant kubectl apply -f -
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: default
-    namespace: metallb-system
-  spec:
-    addresses:
-    - ${METALLB_ADDR_POOL}
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: empty
-    namespace: metallb-system
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: example
+  namespace: metallb-system
+spec:
+  addresses:
+  - ${METALLB_ADDR_POOL}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: empty
+  namespace: metallb-system
 EOF
 
   echo "metallb installed."
