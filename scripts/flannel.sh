@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-if [ -n "calico" ];then
+if [ -n "$FLANNEL_VERSION" ];then
   # Install flannel Network Plugin
   if [ $FLANNEL_VERSION == "main" ];then
     KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://github.com/flannel-io/flannel/releases/laeset/download/kube-flannel.yml
