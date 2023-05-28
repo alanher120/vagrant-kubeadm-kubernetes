@@ -7,8 +7,14 @@ set -euxo pipefail
 config_path="/vagrant/configs"
 
 #DASHBOARD_VERSION=$(grep -E '^\s*dashboard:' /vagrant/settings.yaml | sed -E 's/[^:]+: *//')
+
 if [ -n "${DASHBOARD_VERSION}" ]; then
-  sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
+  #sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
+  if [ "${METRICS_SERVER_VERSION}" == "main" ];then
+    sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/main/manifests/metrics-server.yaml
+  else
+    sudo -i -u vagrant kubectl apply -f https://raw.githubusercontent.com/techiescamp/kubeadm-scripts/v${DASHBOARD_VERSION}/manifests/metrics-server.yaml
+  fi
   echo 'Waiting for metrics server to be ready...'
   sudo -i -u vagrant kubectl wait --namespace kube-system \
     --for=condition=ready pod \
@@ -19,11 +25,11 @@ if [ -n "${DASHBOARD_VERSION}" ]; then
   #  sleep 5
   #done
   echo 'Metrics server is ready. Installing dashboard...'
-
+  
   sudo -i -u vagrant kubectl create namespace kubernetes-dashboard
-
+  
   echo "Creating the dashboard user..."
-
+  
   cat <<EOF | sudo -i -u vagrant kubectl apply -f -
 apiVersion: v1
 kind: ServiceAccount
@@ -59,8 +65,13 @@ subjects:
 EOF
 
   echo "Deploying the dashboard..."
-  sudo -i -u vagrant kubectl apply -f "https://raw.githubusercontent.com/kubernetes/dashboard/v${DASHBOARD_VERSION}/aio/deploy/recommended.yaml"
-
+  #sudo -i -u vagrant kubectl apply -f "https://raw.githubusercontent.com/kubernetes/dashboard/v${DASHBOARD_VERSION}/aio/deploy/recommended.yaml"
+  if [ "${DASHBOARD_VERSION}" == "main" ];then
+    sudo -i -u vagrant kubectl apply -f "https://raw.githubusercontent.com/kubernetes/dashboard/main/aio/deploy/recommended.yaml"
+  else
+    sudo -i -u vagrant kubectl apply -f "https://raw.githubusercontent.com/kubernetes/dashboard/v${DASHBOARD_VERSION}/aio/deploy/recommended.yaml"
+  fi
+  
   sudo -i -u vagrant kubectl -n kubernetes-dashboard get secret/admin-user -o go-template="{{.data.token | base64decode}}" >> "${config_path}/token"
   echo "The following token was also saved to: configs/token"
   cat "${config_path}/token"
