@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-if [ -n "calico" ];then
+if [ -n "$CALICO_VERSION" ];then
   # Install Calico Network Plugin
   if [ $CALICO_VERSION == "main" ];then
     KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/main/manifests/calico.yaml
