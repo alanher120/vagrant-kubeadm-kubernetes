@@ -159,7 +159,7 @@ Vagrant.configure("2") do |config|
         node.vm.provision "shell", 
         env: {
           "METALLB_VERSION" => settings["software"]["metallb"],
-          "METALLB_ADDR_POOL" => settings["metallb"]["addr_pool"]
+          "METALLB_ADDR_POOL" => settings["network"]["loadbalancer_addr_pool"]
         },
         path: "scripts/metallb.sh"
       end
