@@ -46,8 +46,8 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = true
   
   i=1
-  config.vm.define "master#{i}" do |master|
-    master.vm.hostname = "master-node#{i}"
+  config.vm.define "master" do |master|
+    master.vm.hostname = "master-node"
     master.vm.network "private_network", ip: "#{IP_NW} + #{IP_START - 1 + i}"
     if settings["shared_folders"]
       settings["shared_folders"].each do |shared_folder|
