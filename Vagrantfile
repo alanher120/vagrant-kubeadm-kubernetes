@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       cat /etc/hosts.tmp > /etc/hosts
       echo "$IP_NW$((IP_START)) master-node" >> /etc/hosts
       
-      for i in `seq 1 ${NUM_MASTER_NODES}`; do
+      for i in `seq 2 ${NUM_MASTER_NODES}`; do
         echo "$IP_NW$((IP_START-1+i)) master-node${i}" >> /etc/hosts
       done
       
