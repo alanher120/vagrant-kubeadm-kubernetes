@@ -69,16 +69,18 @@ Vagrant.configure("2") do |config|
         "OS" => settings["software"]["os"]
       },
       path: "scripts/common.sh"
-    master.vm.provision "shell",
-      env: {
-        "CALICO_VERSION" => settings["software"]["calico"],
-        "CONTROL_IP" => settings["network"]["control_ip"],
-        "POD_CIDR" => settings["network"]["pod_cidr"],
-        "IP_NW" => IP_NW,
-        "IP_START" => IP_START,
-        "SERVICE_CIDR" => settings["network"]["service_cidr"]
-      },
-      path: "scripts/master.sh"
+    if settings["software"]["create_cluster"] == 1
+      master.vm.provision "shell",
+        env: {
+          "CALICO_VERSION" => settings["software"]["calico"],
+          "CONTROL_IP" => settings["network"]["control_ip"],
+          "POD_CIDR" => settings["network"]["pod_cidr"],
+          "IP_NW" => IP_NW,
+          "IP_START" => IP_START,
+          "SERVICE_CIDR" => settings["network"]["service_cidr"]
+        },
+        path: "scripts/master.sh"
+    end
   end
   
   if NUM_MASTER_NODES > 1
@@ -106,16 +108,18 @@ Vagrant.configure("2") do |config|
             "OS" => settings["software"]["os"]
           },
           path: "scripts/common.sh"
-        master.vm.provision "shell",
-          env: {
-            "CALICO_VERSION" => settings["software"]["calico"],
-            "CONTROL_IP" => settings["network"]["control_ip"],
-            "POD_CIDR" => settings["network"]["pod_cidr"],
-            "IP_NW" => IP_NW,
-            "IP_START" => IP_START,
-            "SERVICE_CIDR" => settings["network"]["service_cidr"]
-          },
-          path: "scripts/master.sh"
+        if settings["software"]["create_cluster"] == 1
+          master.vm.provision "shell",
+            env: {
+              "CALICO_VERSION" => settings["software"]["calico"],
+              "CONTROL_IP" => settings["network"]["control_ip"],
+              "POD_CIDR" => settings["network"]["pod_cidr"],
+              "IP_NW" => IP_NW,
+              "IP_START" => IP_START,
+              "SERVICE_CIDR" => settings["network"]["service_cidr"]
+            },
+            path: "scripts/master.sh"
+        end
       end
     end
   end
@@ -145,8 +149,10 @@ Vagrant.configure("2") do |config|
           "OS" => settings["software"]["os"]
         },
         path: "scripts/common.sh"
-      node.vm.provision "shell", path: "scripts/node.sh"
-
+      if settings["software"]["create_cluster"] == 1
+        node.vm.provision "shell", 
+          path: "scripts/node.sh"
+      end
       # Only install the dashboard after provisioning the first worker (and when enabled).
       if i == 1 and settings["software"]["dashboard"] and settings["software"]["metrics_server"] and settings["software"]["dashboard"] != "" and settings["software"]["metrics_server"] != ""
         node.vm.provision "shell", 
