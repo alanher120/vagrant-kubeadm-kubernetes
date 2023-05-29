@@ -25,18 +25,18 @@ if [ "$HOSTNAME" == "master-node" ];then
   # Install Calico Network Plugin
   #curl https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml -O
   #kubectl apply -f calico.yaml
-  KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
-  
-  sleep 20
-  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
-                --for=condition=ready pod \
-                --selector=k8s-app=calico-kube-controllers \
-                --timeout=180s
-  
-  KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
-                --for=condition=ready pod \
-                --selector=k8s-app=calico-node \
-                --timeout=180s
+  #KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v${CALICO_VERSION}/manifests/calico.yaml
+  #
+  #sleep 20
+  #KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
+  #              --for=condition=ready pod \
+  #              --selector=k8s-app=calico-kube-controllers \
+  #              --timeout=180s
+  #
+  #KUBECONFIG=/etc/kubernetes/admin.conf kubectl wait --namespace kube-system \
+  #              --for=condition=ready pod \
+  #              --selector=k8s-app=calico-node \
+  #              --timeout=180s
   
   # Save Configs to shared /Vagrant location
   cp -i /etc/kubernetes/admin.conf $config_path/config
