@@ -35,15 +35,14 @@ if [ -d /etc/modules.load.d/ ];then
 fi
 
 # install go lang and make
-apt-get install golang -y
-apt-get install libnl-3-dev libnl-genl-3-dev -y
-apt install make -y
-
+#apt-get install golang -y
 curl -LO https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
 export GOROOT=/usr/local/go
 export GOPATH=$GOROOT/bin
 rm -rf $GOROOT ; tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
 export PATH=$GOPATH:$PATH
+apt-get install libnl-3-dev libnl-genl-3-dev -y
+apt install make -y
 
 go get -u golang.org/x/crypto/ssh
 go get -u github.com/dlintw/goconf
