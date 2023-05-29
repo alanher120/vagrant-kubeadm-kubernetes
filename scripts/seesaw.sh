@@ -46,7 +46,7 @@ go get -u github.com/golang/protobuf/proto
 
 # complic swwsaw
 git clone https://github.com/google/seesaw.git
-cd swwsaw
+cd seesaw
 make test && make install
 
 # install swwsaw
