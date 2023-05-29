@@ -83,7 +83,7 @@ Vagrant.configure("2") do |config|
         path: "scripts/master.sh"
             # install network addon
       if settings["software"]["cni"] and settings["software"]["cni"] != "" 
-        if CNI == "caclico"
+        if CNI = "caclico"
           master.vm.provision "shell",
           env: {
             "CALICO_VERSION" => settings["software"]["calico"],
@@ -95,7 +95,7 @@ Vagrant.configure("2") do |config|
           },
           path: "scripts/calico.sh"
 
-        elsif CNI == "flannel"
+        elsif CNI = "flannel"
           master.vm.provision "shell",
           env: {
             "FLANNEL_VERSION" => settings["software"]["flannel"],
