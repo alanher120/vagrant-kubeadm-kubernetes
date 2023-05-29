@@ -4,21 +4,23 @@
 set -euxo pipefail
 
 modprobe ip_vs
-#modprobe nf_conntrack_ipv4
+modprobe nf_conntrack_ipv4
 modprobe nf_conntrack
 modprobe dummy numdummies=1
 
 # modprobe.d
 if [ -d /etc/modprobe.d/ ];then
   echo options ip_vs > /etc/modprobe.d/ip_vs.conf
-  echo options nf_conntrack > /etc/modprobe.d/nf_conntrack_ipv4.conf
+  echo options nf_conntrack > /etc/modprobe.d/nf_conntrack.conf
+  echo options nf_conntrack_ipv4 > /etc/modprobe.d/nf_conntrack_ipv4.conf
   echo options dummy numdummies=1 > /etc/modprobe.d/dummy.conf
 fi
 
 # systemd
 if [ -d /etc/modules.load.d/ ];then
   echo ip_vs > /etc/modules.load.d/ip_vs.conf
-  echo nf_conntrack > /etc/modules.load.d/nf_conntrack_ipv4.conf
+  echo nf_conntrack_ipv4 > /etc/modules.load.d/nf_conntrack_ipv4.conf
+  echo nf_conntrack > /etc/modules.load.d/nf_conntrack.conf
   echo dummy numdummies=1 > /etc/modules.load.d/dummy.conf
   systemctl restart systemd-modules-load.service
 fi
