@@ -22,6 +22,7 @@ if [ -n "${METALLB_VERSION}" ];then
                   --timeout=180s
 
   # Setup address pool used by loadbalancers
+  sleep 6
   cat << EOF | sudo -i -u vagrant kubectl apply -f -
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
