@@ -63,29 +63,17 @@ Vagrant.configure("2") do |config|
           vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
         end
     end
-    master.vm.provision "shell",
-      env: {
-        "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-        "ENVIRONMENT" => settings["environment"],
-        "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-        "OS" => settings["software"]["os"]
-      },
-      path: "scripts/common.sh"
-    if settings["software"]["create_cluster"] == 1
+    if settings["software"]["install_k8s_pkgs"] == 1
       master.vm.provision "shell",
         env: {
-          "CALICO_VERSION" => settings["software"]["calico"],
-          "CONTROL_IP" => settings["network"]["control_ip"],
-          "POD_CIDR" => settings["network"]["pod_cidr"],
-          "IP_NW" => IP_NW,
-          "IP_START" => IP_START,
-          "SERVICE_CIDR" => settings["network"]["service_cidr"]
+          "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+          "ENVIRONMENT" => settings["environment"],
+          "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+          "OS" => settings["software"]["os"]
         },
-        path: "scripts/master.sh"
-            # install network addon
-      if settings["software"]["cni"] and settings["software"]["cni"] != "" 
-        if CNI = "caclico"
-          master.vm.provision "shell",
+        path: "scripts/common.sh"
+      if settings["software"]["create_cluster"] == 1
+        master.vm.provision "shell",
           env: {
             "CALICO_VERSION" => settings["software"]["calico"],
             "CONTROL_IP" => settings["network"]["control_ip"],
@@ -94,19 +82,33 @@ Vagrant.configure("2") do |config|
             "IP_START" => IP_START,
             "SERVICE_CIDR" => settings["network"]["service_cidr"]
           },
-          path: "scripts/calico.sh"
+          path: "scripts/master.sh"
+              # install network addon
+        if settings["software"]["cni"] and settings["software"]["cni"] != "" 
+          if CNI = "caclico"
+            master.vm.provision "shell",
+            env: {
+              "CALICO_VERSION" => settings["software"]["calico"],
+              "CONTROL_IP" => settings["network"]["control_ip"],
+              "POD_CIDR" => settings["network"]["pod_cidr"],
+              "IP_NW" => IP_NW,
+              "IP_START" => IP_START,
+              "SERVICE_CIDR" => settings["network"]["service_cidr"]
+            },
+            path: "scripts/calico.sh"
 
-        elsif CNI = "flannel"
-          master.vm.provision "shell",
-          env: {
-            "FLANNEL_VERSION" => settings["software"]["flannel"],
-            "CONTROL_IP" => settings["network"]["control_ip"],
-            "POD_CIDR" => settings["network"]["pod_cidr"],
-            "IP_NW" => IP_NW,
-            "IP_START" => IP_START,
-            "SERVICE_CIDR" => settings["network"]["service_cidr"]
-          },
-          path: "scripts/flannel.sh"
+          elsif CNI = "flannel"
+            master.vm.provision "shell",
+            env: {
+              "FLANNEL_VERSION" => settings["software"]["flannel"],
+              "CONTROL_IP" => settings["network"]["control_ip"],
+              "POD_CIDR" => settings["network"]["pod_cidr"],
+              "IP_NW" => IP_NW,
+              "IP_START" => IP_START,
+              "SERVICE_CIDR" => settings["network"]["service_cidr"]
+            },
+            path: "scripts/flannel.sh"
+          end
         end
       end
     end
@@ -129,25 +131,27 @@ Vagrant.configure("2") do |config|
               vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
             end
         end
-        master.vm.provision "shell",
-          env: {
-            "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-            "ENVIRONMENT" => settings["environment"],
-            "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-            "OS" => settings["software"]["os"]
-          },
-          path: "scripts/common.sh"
-        if settings["software"]["create_cluster"] == 1
+        if settings["software"]["install_k8s_pkgs"] == 1
           master.vm.provision "shell",
             env: {
-              "CALICO_VERSION" => settings["software"]["calico"],
-              "CONTROL_IP" => settings["network"]["control_ip"],
-              "POD_CIDR" => settings["network"]["pod_cidr"],
-              "IP_NW" => IP_NW,
-              "IP_START" => IP_START,
-              "SERVICE_CIDR" => settings["network"]["service_cidr"]
+              "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+              "ENVIRONMENT" => settings["environment"],
+              "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+              "OS" => settings["software"]["os"]
             },
-            path: "scripts/master.sh"
+            path: "scripts/common.sh"
+          if settings["software"]["create_cluster"] == 1
+            master.vm.provision "shell",
+              env: {
+                "CALICO_VERSION" => settings["software"]["calico"],
+                "CONTROL_IP" => settings["network"]["control_ip"],
+                "POD_CIDR" => settings["network"]["pod_cidr"],
+                "IP_NW" => IP_NW,
+                "IP_START" => IP_START,
+                "SERVICE_CIDR" => settings["network"]["service_cidr"]
+              },
+              path: "scripts/master.sh"
+          end
         end
       end
     end
@@ -169,40 +173,42 @@ Vagrant.configure("2") do |config|
             vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
           end
       end
-      node.vm.provision "shell",
-        env: {
-          "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-          "ENVIRONMENT" => settings["environment"],
-          "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-          "OS" => settings["software"]["os"]
-        },
-        path: "scripts/common.sh"
-      if settings["software"]["create_cluster"] == 1
-        node.vm.provision "shell", 
-          path: "scripts/node.sh"
-        # Only install the dashboard after provisioning the first worker (and when enabled).
-        if i == 1 and settings["software"]["dashboard"] and settings["software"]["metrics_server"] and settings["software"]["dashboard"] != "" and settings["software"]["metrics_server"] != ""
-          node.vm.provision "shell", 
+      if settings["software"]["install_k8s_pkgs"] == 1
+        node.vm.provision "shell",
           env: {
-            "DASHBOARD_VERSION" => settings["software"]["dashboard"],
-            "METRICS_SERVER_VERSION" => settings["software"]["metrics_server"]
+            "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+            "ENVIRONMENT" => settings["environment"],
+            "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+            "OS" => settings["software"]["os"]
           },
-          path: "scripts/dashboard.sh"
-        end
-        if i == 1 and settings["software"]["metallb"] and settings["software"]["metallb"] != ""
+          path: "scripts/common.sh"
+        if settings["software"]["create_cluster"] == 1
           node.vm.provision "shell", 
-          env: {
-            "METALLB_VERSION" => settings["software"]["metallb"],
-            "METALLB_ADDR_POOL" => settings["network"]["loadbalancer_addr_pool"]
-          },
-          path: "scripts/metallb.sh"
-        end
-        if i == 1 and settings["software"]["ingress_nginx"] and settings["software"]["ingress_nginx"] != ""
-          node.vm.provision "shell", 
-          env: {
-            "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
-          },
-          path: "scripts/ingress-nginx.sh"
+            path: "scripts/node.sh"
+          # Only install the dashboard after provisioning the first worker (and when enabled).
+          if i == 1 and settings["software"]["dashboard"] and settings["software"]["metrics_server"] and settings["software"]["dashboard"] != "" and settings["software"]["metrics_server"] != ""
+            node.vm.provision "shell", 
+            env: {
+              "DASHBOARD_VERSION" => settings["software"]["dashboard"],
+              "METRICS_SERVER_VERSION" => settings["software"]["metrics_server"]
+            },
+            path: "scripts/dashboard.sh"
+          end
+          if i == 1 and settings["software"]["metallb"] and settings["software"]["metallb"] != ""
+            node.vm.provision "shell", 
+            env: {
+              "METALLB_VERSION" => settings["software"]["metallb"],
+              "METALLB_ADDR_POOL" => settings["network"]["loadbalancer_addr_pool"]
+            },
+            path: "scripts/metallb.sh"
+          end
+          if i == 1 and settings["software"]["ingress_nginx"] and settings["software"]["ingress_nginx"] != ""
+            node.vm.provision "shell", 
+            env: {
+              "INGRESS_NGINX_VERSION" => settings["software"]["ingress_nginx"]
+            },
+            path: "scripts/ingress-nginx.sh"
+          end
         end
       end
     end
