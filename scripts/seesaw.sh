@@ -73,10 +73,10 @@ INIT=`ps -p 1 -o comm=`
 
 install -d "${SEESAW_BIN}" "${SEESAW_ETC}" "${SEESAW_LOG}"
 
-install "${GOPATH}/bin/seesaw_cli" /usr/bin/seesaw
+install "${GOPATH}/seesaw_cli" /usr/bin/seesaw
 
 for component in {ecu,engine,ha,healthcheck,ncc,watchdog}; do
-  install "${GOPATH}/bin/seesaw_${component}" "${SEESAW_BIN}"
+  install "${GOPATH}/seesaw_${component}" "${SEESAW_BIN}"
 done
 
 if [ $INIT = "init" ]; then
