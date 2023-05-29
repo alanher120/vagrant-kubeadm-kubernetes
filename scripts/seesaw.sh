@@ -25,6 +25,27 @@ if [ -d /etc/modules.load.d/ ];then
   systemctl restart systemd-modules-load.service
 fi
 
+# install go lang
+apt-get install golang
+apt-get install libnl-3-dev libnl-genl-3-dev
+
+#rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
+#export PATH=/usr/local/go:$PATH
+
+go get -u golang.org/x/crypto/ssh
+go get -u github.com/dlintw/goconf
+go get -u github.com/golang/glog
+go get -u github.com/miekg/dns
+go get -u github.com/kylelemons/godebug/pretty
+go get -u github.com/golang/protobuf/proto
+
+# complic swwsaw
+# git clone https://github.com/google/seesaw.git
+cd swwsaw
+make test
+make install
+
+# install swwsaw
 SEESAW_BIN="/usr/local/seesaw"
 SEESAW_ETC="/etc/seesaw"
 SEESAW_LOG="/var/log/seesaw"
