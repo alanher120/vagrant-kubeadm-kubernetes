@@ -47,46 +47,35 @@ Vagrant.configure("2") do |config|
   end
   config.vm.box_check_update = true
   
-  i=1
-  config.vm.define "master" do |master|
-    master.vm.hostname = "master-node"
-    master.vm.network "private_network", ip: "#{IP_NW}#{IP_START - 1 + i}"
-    if settings["shared_folders"]
-      settings["shared_folders"].each do |shared_folder|
-        master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
-      end
-    end
-    master.vm.provider "virtualbox" do |vb|
-        vb.cpus = settings["nodes"]["control"]["cpu"]
-        vb.memory = settings["nodes"]["control"]["memory"]
-        if settings["cluster_name"] and settings["cluster_name"] != ""
-          vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+  if NUM_MASTER_NODES > 0
+    i=1
+    config.vm.define "master" do |master|
+      master.vm.hostname = "master-node"
+      master.vm.network "private_network", ip: "#{IP_NW}#{IP_START - 1 + i}"
+      master.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+      if settings["shared_folders"]
+        settings["shared_folders"].each do |shared_folder|
+          master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"], type: "virtualbox"
         end
-    end
-    if settings["software"]["install_k8s_pkgs"] == 1
-      master.vm.provision "shell",
-        env: {
-          "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
-          "ENVIRONMENT" => settings["environment"],
-          "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
-          "OS" => settings["software"]["os"]
-        },
-        path: "scripts/common.sh"
-      if settings["software"]["create_cluster"] == 1
+      end
+      master.vm.provider "virtualbox" do |vb|
+          vb.cpus = settings["nodes"]["control"]["cpu"]
+          vb.memory = settings["nodes"]["control"]["memory"]
+          if settings["cluster_name"] and settings["cluster_name"] != ""
+            vb.customize ["modifyvm", :id, "--groups", ("/" + settings["cluster_name"])]
+          end
+      end
+      if settings["software"]["install_k8s_pkgs"] == 1
         master.vm.provision "shell",
           env: {
-            "CALICO_VERSION" => settings["software"]["calico"],
-            "CONTROL_IP" => settings["network"]["control_ip"],
-            "POD_CIDR" => settings["network"]["pod_cidr"],
-            "IP_NW" => IP_NW,
-            "IP_START" => IP_START,
-            "SERVICE_CIDR" => settings["network"]["service_cidr"]
+            "DNS_SERVERS" => settings["network"]["dns_servers"].join(" "),
+            "ENVIRONMENT" => settings["environment"],
+            "KUBERNETES_VERSION" => settings["software"]["kubernetes"],
+            "OS" => settings["software"]["os"]
           },
-          path: "scripts/master.sh"
-              # install network addon
-        if settings["software"]["cni"] and settings["software"]["cni"] != "" 
-          if CNI = "caclico"
-            master.vm.provision "shell",
+          path: "scripts/common.sh"
+        if settings["software"]["create_cluster"] == 1
+          master.vm.provision "shell",
             env: {
               "CALICO_VERSION" => settings["software"]["calico"],
               "CONTROL_IP" => settings["network"]["control_ip"],
@@ -95,19 +84,33 @@ Vagrant.configure("2") do |config|
               "IP_START" => IP_START,
               "SERVICE_CIDR" => settings["network"]["service_cidr"]
             },
-            path: "scripts/calico.sh"
+            path: "scripts/master.sh"
+                # install network addon
+          if settings["software"]["cni"] and settings["software"]["cni"] != "" 
+            if CNI = "caclico"
+              master.vm.provision "shell",
+              env: {
+                "CALICO_VERSION" => settings["software"]["calico"],
+                "CONTROL_IP" => settings["network"]["control_ip"],
+                "POD_CIDR" => settings["network"]["pod_cidr"],
+                "IP_NW" => IP_NW,
+                "IP_START" => IP_START,
+                "SERVICE_CIDR" => settings["network"]["service_cidr"]
+              },
+              path: "scripts/calico.sh"
 
-          elsif CNI = "flannel"
-            master.vm.provision "shell",
-            env: {
-              "FLANNEL_VERSION" => settings["software"]["flannel"],
-              "CONTROL_IP" => settings["network"]["control_ip"],
-              "POD_CIDR" => settings["network"]["pod_cidr"],
-              "IP_NW" => IP_NW,
-              "IP_START" => IP_START,
-              "SERVICE_CIDR" => settings["network"]["service_cidr"]
-            },
-            path: "scripts/flannel.sh"
+            elsif CNI = "flannel"
+              master.vm.provision "shell",
+              env: {
+                "FLANNEL_VERSION" => settings["software"]["flannel"],
+                "CONTROL_IP" => settings["network"]["control_ip"],
+                "POD_CIDR" => settings["network"]["pod_cidr"],
+                "IP_NW" => IP_NW,
+                "IP_START" => IP_START,
+                "SERVICE_CIDR" => settings["network"]["service_cidr"]
+              },
+              path: "scripts/flannel.sh"
+            end
           end
         end
       end
@@ -119,9 +122,10 @@ Vagrant.configure("2") do |config|
       config.vm.define "master#{i}" do |master|
         master.vm.hostname = "master-node#{i}"
         master.vm.network "private_network", ip: "#{IP_NW}#{IP_START - 1 + i}"
+        master.vm.synced_folder ".", "/vagrant", type: "virtualbox"
         if settings["shared_folders"]
           settings["shared_folders"].each do |shared_folder|
-            master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+            master.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"], type: "virtualbox"
           end
         end
         master.vm.provider "virtualbox" do |vb|
@@ -161,9 +165,10 @@ Vagrant.configure("2") do |config|
     config.vm.define "node0#{i}" do |node|
       node.vm.hostname = "worker-node0#{i}"
       node.vm.network "private_network", ip: "#{IP_NW}#{IP_START + 4 + i}"
+      node.vm.synced_folder ".", "/vagrant", type: "virtualbox"
       if settings["shared_folders"]
         settings["shared_folders"].each do |shared_folder|
-          node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"]
+          node.vm.synced_folder shared_folder["host_path"], shared_folder["vm_path"], type: "virtualbox"
         end
       end
       node.vm.provider "virtualbox" do |vb|
