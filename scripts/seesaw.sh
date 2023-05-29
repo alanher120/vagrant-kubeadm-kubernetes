@@ -26,8 +26,8 @@ if [ -d /etc/modules.load.d/ ];then
 fi
 
 # install go lang
-apt-get install golang
-apt-get install libnl-3-dev libnl-genl-3-dev
+apt-get install golang -y
+apt-get install libnl-3-dev libnl-genl-3-dev -y
 
 #rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
 #export PATH=/usr/local/go:$PATH
@@ -42,6 +42,7 @@ go get -u github.com/golang/protobuf/proto
 # complic swwsaw
 # git clone https://github.com/google/seesaw.git
 cd swwsaw
+apt install make -y
 make test
 make install
 
