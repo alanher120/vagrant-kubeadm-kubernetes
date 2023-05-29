@@ -1,6 +1,7 @@
 #!/bin/bash
+# https://blog.csdn.net/Jeeper_/article/details/50683047
 # https://codeantenna.com/a/FOtutjP9od
-#https://blog.csdn.net/Jeeper_/article/details/50683047
+# https://blog.csdn.net/Jeeper_/article/details/50683047
 set -euxo pipefail
 
 modprobe ip_vs
@@ -30,6 +31,7 @@ apt-get install golang -y
 apt-get install libnl-3-dev libnl-genl-3-dev -y
 apt install make -y
 
+curl -LO https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
 rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
 export PATH=/usr/local/go:$PATH
 
