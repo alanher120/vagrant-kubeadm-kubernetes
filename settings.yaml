@@ -32,6 +32,8 @@ nodes:
 #   - host_path: ../images
 #     vm_path: /vagrant/images
 software:
+  # 1 install kubernetes packages
+  install_k8s_pkgs: 1
   # 1 create cluster , 0 do not create cluster
   create_cluster: 1
   # can be calico flannel
