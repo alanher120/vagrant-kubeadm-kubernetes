@@ -4,7 +4,8 @@
 set -euxo pipefail
 
 modprobe ip_vs
-modprobe nf_conntrack_ipv4
+#modprobe nf_conntrack_ipv4
+modprobe nf_conntrack
 modprobe dummy numdummies=1
 
 # modprobe.d
