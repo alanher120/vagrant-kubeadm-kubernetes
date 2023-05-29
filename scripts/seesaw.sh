@@ -9,6 +9,14 @@ modprobe nf_conntrack_ipv4
 modprobe nf_conntrack
 modprobe dummy numdummies=1
 
+# rc.local
+cat <<EOF > /etc/rc.local
+modprobe ip_vs
+modprobe nf_conntrack_ipv4
+modprobe nf_conntrack
+modprobe dummy numdummies=1
+EOF
+
 # modprobe.d
 if [ -d /etc/modprobe.d/ ];then
   echo options ip_vs > /etc/modprobe.d/ip_vs.conf
@@ -32,8 +40,8 @@ apt-get install libnl-3-dev libnl-genl-3-dev -y
 apt install make -y
 
 curl -LO https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
-export GOPATH=/usr/local/go/bin
 export GOROOT=/usr/local/go
+export GOPATH=$GOROOT/bin
 rm -rf $GOROOT ; tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
 export PATH=$GOPATH:$PATH
 
@@ -53,6 +61,13 @@ make test && make install
 SEESAW_BIN="/usr/local/seesaw"
 SEESAW_ETC="/etc/seesaw"
 SEESAW_LOG="/var/log/seesaw"
+
+cat <<EOF >> ~/.profile 
+SEESAW_BIN="/usr/local/seesaw"
+SEESAW_ETC="/etc/seesaw"
+SEESAW_LOG="/var/log/seesaw"
+export PATH=$SEESAW_BIN:$PATH
+EOF
 
 INIT=`ps -p 1 -o comm=`
 
