@@ -1,5 +1,6 @@
 #!/bin/bash
 # https://codeantenna.com/a/FOtutjP9od
+#https://blog.csdn.net/Jeeper_/article/details/50683047
 set -euxo pipefail
 
 modprobe ip_vs
