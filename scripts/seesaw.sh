@@ -40,7 +40,7 @@ go get -u github.com/kylelemons/godebug/pretty
 go get -u github.com/golang/protobuf/proto
 
 # complic swwsaw
-# git clone https://github.com/google/seesaw.git
+git clone https://github.com/google/seesaw.git
 cd swwsaw
 apt install make -y
 make test
