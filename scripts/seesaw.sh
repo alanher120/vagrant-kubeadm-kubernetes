@@ -30,8 +30,8 @@ apt-get install golang -y
 apt-get install libnl-3-dev libnl-genl-3-dev -y
 apt install make -y
 
-#rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
-#export PATH=/usr/local/go:$PATH
+rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
+export PATH=/usr/local/go:$PATH
 
 go get -u golang.org/x/crypto/ssh
 go get -u github.com/dlintw/goconf
