@@ -14,6 +14,7 @@ NUM_MASTER_NODES = settings["nodes"]["control"]["count"]
 CNI = settings["software"]["cni"]
 
 Vagrant.configure("2") do |config|
+  config.vm.boot_timeout = 180
   config.vagrant.plugins = ["vagrant-cachier"]
   config.cache.scope = :machine
   
