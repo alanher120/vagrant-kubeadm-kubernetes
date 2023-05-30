@@ -1,21 +1,27 @@
-#!/bin/bash
+!/bin/bash
+# ref:
 # https://blog.csdn.net/Jeeper_/article/details/50683047
 # https://codeantenna.com/a/FOtutjP9od
 # https://blog.csdn.net/Jeeper_/article/details/50683047
-set -euxo pipefail
+set -ux
 
 modprobe ip_vs
 modprobe nf_conntrack_ipv4
 modprobe nf_conntrack
 modprobe dummy numdummies=1
 
-# rc.local
+set -e
+
 cat <<EOF > /etc/rc.local
+#!/bin/bash
 modprobe ip_vs
 modprobe nf_conntrack_ipv4
 modprobe nf_conntrack
 modprobe dummy numdummies=1
 EOF
+
+chmod +x /etc/rc.local
+systemctl enable rc-local
 
 # modprobe.d
 if [ -d /etc/modprobe.d/ ];then
@@ -34,15 +40,46 @@ if [ -d /etc/modules.load.d/ ];then
   systemctl restart systemd-modules-load.service
 fi
 
-# install go lang and make
-#apt-get install golang -y
-curl -LO https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
-export GOROOT=/usr/local/go
-export GOPATH=$GOROOT/bin
-rm -rf $GOROOT ; tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
-export PATH=$GOPATH:$PATH
-apt-get install libnl-3-dev libnl-genl-3-dev -y
-apt install make -y
+rm -rf /root/go
+mkdir -p /root/go
+export GOPATH=/root/go
+
+GO111MODULE=off
+golan=2
+
+if [ $golan -eq 1 ];then
+  # install go lang 1
+  apt-get install golang -y
+fi 
+
+if [ $golan -eq 2 ];then
+  export PATH=/usr/local/go/bin:$PATH
+
+  # install go lang 2
+  [ -f go.tar.gz ] || curl -Lo go.tar.gz https://go.dev/dl/go1.19.3.linux-amd64.tar.gz
+  rm -rf /usr/local/go ; tar -C /usr/local -xzf go.tar.gz
+fi
+
+if [ $golan -eq 3 ];then
+  export PATH=/usr/local/go/bin:$PATH
+  
+  # install go lang 3
+  apt-get install golang -y
+  curl -LO https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
+  rm -rf /usr/local/go ; tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
+fi
+
+which go
+go version
+
+# install dependencies
+apt-get install libnl-3-dev libnl-genl-3-dev build-essential git curl wget -y
+
+# compile swwsaw
+mkdir -p ${GOPATH}/src/github.com/google
+cd ${GOPATH}/src/github.com/google
+git clone https://github.com/google/seesaw.git
+cd seesaw
 
 go get -u golang.org/x/crypto/ssh
 go get -u github.com/dlintw/goconf
@@ -51,31 +88,27 @@ go get -u github.com/miekg/dns
 go get -u github.com/kylelemons/godebug/pretty
 go get -u github.com/golang/protobuf/proto
 
-# complic swwsaw
-git clone https://github.com/google/seesaw.git
-cd seesaw
-make test && make install
+if [ "$GO111MODULE" == "off" ];then
+  go get -u github.com/fsnotify/fsnotify
+  go get -u golang.org/x/term   
+fi
+
+make test 
+make install
 
 # install swwsaw
 SEESAW_BIN="/usr/local/seesaw"
 SEESAW_ETC="/etc/seesaw"
 SEESAW_LOG="/var/log/seesaw"
 
-cat <<EOF >> ~/.profile 
-SEESAW_BIN="/usr/local/seesaw"
-SEESAW_ETC="/etc/seesaw"
-SEESAW_LOG="/var/log/seesaw"
-export PATH=$SEESAW_BIN:$PATH
-EOF
-
 INIT=`ps -p 1 -o comm=`
 
 install -d "${SEESAW_BIN}" "${SEESAW_ETC}" "${SEESAW_LOG}"
 
-install "${GOPATH}/seesaw_cli" /usr/bin/seesaw
+install "${GOPATH}/bin/seesaw_cli" /usr/bin/seesaw
 
 for component in {ecu,engine,ha,healthcheck,ncc,watchdog}; do
-  install "${GOPATH}/seesaw_${component}" "${SEESAW_BIN}"
+  install "${GOPATH}/bin/seesaw_${component}" "${SEESAW_BIN}"
 done
 
 if [ $INIT = "init" ]; then
@@ -90,82 +123,5 @@ install "etc/seesaw/watchdog.cfg" "${SEESAW_ETC}"
 /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_ha"
 /sbin/setcap cap_net_raw+ep "${SEESAW_BIN}/seesaw_healthcheck"
 
-# write seesaw.cfg
-cat <<EOF > /etc/seesaw/seesaw.cfg
-[cluster]
-anycast_enabled = false
-name = au-syd
-node_ipv4 = 10.0.0.10
-peer_ipv4 = 10.0.0.15
-vip_ipv4 = 10.0.0.9
-
-[config_server]
-primary = master-node
-secondary = worker-node01
-tertiary = worker-node02
-
-[interface]
-node = eth1
-lb = eth2
-EOF
-
-# write cluster.pb
-cat <<EOF > /etc/seesaw/cluster.pb
-seesaw_vip: <
-  fqdn: "seesaw-vip1.example.com."
-  ipv4: "192.168.10.1/24"
-  status: PRODUCTION
->
-node: <
-  fqdn: "seesaw1-1.example.com."
-  ipv4: "192.168.10.2/24"
-  status: PRODUCTION
->
-node: <
-  fqdn: "seesaw1-2.example.com."
-  ipv4: "192.168.10.3/24"
-  status: PRODUCTION
->
-vserver: <
-  name: "dns.resolver@au-syd"
-  entry_address: <
-    fqdn: "dns-anycast.example.com."
-    ipv4: "10.0.0.5/24"
-    status: PRODUCTION
-  >
-  rp: "corpdns-team@example.com"
-  vserver_entry: <
-    protocol: TCP
-    port: 53
-    scheduler: RR
-    server_low_watermark: 0.3
-    healthcheck: <
-      type: DNS
-      interval: 5
-      timeout: 2
-      port: 53
-      send: "www.example.com"
-      receive: "10.0.0.5"
-      mode: DSR
-      method: "a"
-      retries: 1
-    >
-  >
-  backend: <
-    host: <
-      fqdn: "worker-node01."
-      ipv4: "10.0.0.15/24"
-      status: PRODUCTION
-    >
-    weight: 1
-  >
-  backend: <
-    host: <
-      fqdn: "worker-node02."
-      ipv4: "10.0.0.16/24"
-      status: PRODUCTION
-    >
-    weight: 1
-  >
->
-EOF
+install /vagrant/cluster.pb /etc/seesaw
+install /vagrant/seesaw.cfg /etc/seesaw
