@@ -5,6 +5,7 @@
 # https://blog.csdn.net/Jeeper_/article/details/50683047
 set -ux
 
+# tune on or off with using go version 1.11
 #GO111MODULE=off
 
 # create GOPATH
@@ -15,6 +16,7 @@ mkdir -p $GOPATH
 # export PATH
 export PATH=/usr/local/go/bin:$PATH
 
+# load kernel modules
 modprobe ip_vs
 modprobe nf_conntrack_ipv4
 modprobe nf_conntrack
@@ -26,7 +28,7 @@ set -e
 if [ -f /etc/modules ];then
   cat << EOF > /etc/modules
 ip_vs
-dummy
+dummy numdummies=1
 EOF
 fi
 
@@ -46,8 +48,6 @@ if [ -d /etc/modules.load.d/ ];then
   echo dummy numdummies=1 > /etc/modules.load.d/dummy.conf
   systemctl restart systemd-modules-load.service
 fi
-
-exit 0
 
 # install go lang 
 [ ! -f go.tar.gz ] && curl -Lo go.tar.gz https://go.dev/dl/go1.19.1.linux-amd64.tar.gz
@@ -98,16 +98,25 @@ install "etc/seesaw/watchdog.cfg" "${SEESAW_ETC}"
 
 exit 0
 
-install /vagrant/cluster.pb /etc/seesaw
-install /vagrant/seesaw.cfg /etc/seesaw
+install /vagrant/cfgs/cluster.pb /etc/seesaw
+install /vagrant/cfgs/${HOSTNAME}-seesaw.cfg /etc/seesaw/seesaw.cfg
 
 if [ ! -f /vagrant/cert/ca.crt ];then
   openssl req -x509 -sha256 -nodes -newkey rsa:2048 -keyout ca.key -out ca.crt
-
+  
+  MASTER_IP=10.0.0.10
+  SEESAW_IP=10.0.0.10
+  openssl req -new -x509 -sha256 -nodes -newkey rsa:4096 -days 1000 -subj "/CN=${MASTER_IP}" -keyout ca.key -out ca.crt
+  
+  openssl req -new -sha256 -nodes -newkey rsa:2048 -subj "/CN=${SEESAW_IP}" -keyout seesaw.key -out seesaw.csr
+  openssl x509 -req -sha256 -CA ca.crt -CAkey ca.key -CAserial ca.srl -CAcreateserial -days 730 -in seesaw.csr -out seesaw.crt
+  
   mkdir -p /vagrant/cert
   install ca.crt /vagrant/cert
   install ca.key /vagrant/cert
+  install seesaw.key /vagrant/cert
+  install seesaw.key /vagrant/cert
 fi
 
-install /vagrant/cert/ca.crt /etc/seesaw
-install /vagrant/cert/ca.key /etc/seesaw
+install /vagrant/cert/ca.crt /etc/seesaw/ssl
+install /vagrant/cert/ca.key /etc/seesaw/ssl
